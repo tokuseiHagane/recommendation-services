@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock* ./
 COPY shared/ ./shared/
 COPY normalizer/pyproject.toml ./normalizer/
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --no-dev
 
 FROM base AS runtime
 
