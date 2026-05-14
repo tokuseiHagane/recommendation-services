@@ -1,0 +1,1 @@
+"""VkPost migrations package."""

@@ -1,0 +1,136 @@
+---
+# Создание namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redis
+  labels:
+    name: redis
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: redis-label-updater
+  namespace: redis
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-label-updater
+  namespace: redis
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: redis-label-updater-binding
+  namespace: redis
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pod-label-updater
+subjects:
+- kind: ServiceAccount
+  name: redis-label-updater
+---
+# Сервис для доступа к Redis
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: redis
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  selector:
+    app: redis
+    node-type: master
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        node-type: slave # Базовое значение по умолчанию
+    spec:
+      serviceAccountName: redis-label-updater # Требует предварительного создания
+      initContainers:
+      - name: label-updater
+        image: registry.k8s.io/kubectl:v1.29.0
+        command:
+        - kubectl
+        - label
+        - pod
+        - redis-0
+        - node-type=master
+        - --overwrite
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: redis
+            topologyKey: "kubernetes.io/hostname"
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                - worker
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: redis
+      containers:
+      - name: redis
+        image: redis:7.2.4-alpine
+        command:
+        - sh
+        - -c
+        - |
+          if [ `hostname` = "redis-0" ]; then
+            redis-server --appendonly yes
+          else
+            redis-server --slaveof redis-0.redis.redis.svc.cluster.local 6379 --appendonly yes
+          fi
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+      namespace: redis
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

@@ -1,0 +1,32 @@
+# Docker Compose для Development с hot reload
+# Использование: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: "3.9"
+
+services:
+  tgpost:
+    # Override для development
+    build:
+      target: builder  # Используем builder stage для быстрой пересборки
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data
+      - ./specs:/app/specs:ro
+      - ./piccolo_conf.py:/app/piccolo_conf.py:ro
+    environment:
+      - ENV=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+    # Миграции применяются автоматически через docker-entrypoint.sh
+    # command наследуется из Dockerfile
+    # Hot reload через volume mounting
+
+  postgres:
+    # Expose ports для локального доступа
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --locale=C
+
+

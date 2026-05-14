@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-posts-consumer-prod
+  namespace: parsers
+  labels:
+    app: vk-posts-consumer-prod
+    component: posts-consumer
+    provider: vk
+    version: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-posts-consumer-prod
+  template:
+    metadata:
+      labels:
+        app: vk-posts-consumer-prod
+        component: posts-consumer
+        provider: vk
+        version: prod
+    spec:
+      containers:
+        - name: vk-posts-consumer-prod
+          image: ghcr.io/fatdataproduct/telegram-posts-consumers/posts-consumer-prod:latest
+          imagePullPolicy: Always
+          command: ["/docker-entrypoint.sh"]
+          args: ["python", "-m", "src.BootstrapVk"]
+          env:
+            - name: SERVICE
+              value: "vk"
+          envFrom:
+            - configMapRef:
+                name: vk-posts-consumer-prod-configmap
+            - secretRef:
+                name: vk-posts-consumer-prod-secret
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+      nodeSelector:
+        kubernetes.io/hostname: angron-node0
+      imagePullSecrets:
+        - name: ghcr-login-secret

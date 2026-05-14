@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vk-posts-consumer-test-migrate-fake
+  namespace: parsers
+  labels:
+    app: vk-posts-consumer-test
+    provider: vk
+    version: test
+    role: one-shot-migration
+spec:
+  # Одноразовая задача: помечает Piccolo-миграцию VkPost как применённую в
+  # уже существующей БД vkparser_db (таблицы `posts`/`groups` созданы
+  # VKParserService). Запускать ОДИН РАЗ перед первым apply vk-deployment.yaml.
+  #
+  # Повторный запуск в той же БД безопасен (`--fake` идемпотентен:
+  # создаст таблицу piccolo_migration и вставит строку; при повторе просто
+  # залогирует, что миграция уже применена).
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: vk-posts-consumer-test
+        role: one-shot-migration
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: ghcr-login-secret
+      nodeSelector:
+        kubernetes.io/hostname: angron-node0
+      containers:
+        - name: migrate-fake
+          image: ghcr.io/fatdataproduct/social-posts-consumer/posts-consumer-test:latest
+          imagePullPolicy: Always
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              export PICCOLO_CONF=piccolo_conf_vk
+              export DB_HOST="$VK_DB_HOST"
+              export DB_PORT="$VK_DB_PORT"
+              export DB_USER="$VK_DB_USER"
+              export DB_PASSWORD="$VK_DB_PASSWORD"
+              export DB_NAME="$VK_DB_NAME"
+              echo "Marking VkPost migrations as applied in $DB_HOST/$DB_NAME"
+              piccolo migrations forwards VkPost --fake
+              echo "Done. piccolo_migration table state:"
+              piccolo migrations check || true
+          envFrom:
+            - configMapRef:
+                name: vk-posts-consumer-test-configmap
+            - secretRef:
+                name: vk-posts-consumer-test-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tg-channel-consumer-test-service
+  namespace: parsers
+  labels:
+    app: tg-channel-consumer-test
+spec:
+  selector:
+    app: tg-channel-consumer-test
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP

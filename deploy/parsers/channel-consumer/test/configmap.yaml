@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tg-channel-consumer-test-configmap
+  namespace: parsers
+  labels:
+    app: tg-channel-consumer-test
+    version: test
+data:
+  APP_NAME: "tg-channel-consumer"
+  ENV: "test"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+
+  # VK-only контур: TG пайплайн сейчас out of scope (см. backend/parsers/README.md).
+  # start_tg_module() в app.py рано выходит, TG_DB_* не нужны (есть defaults в Settings).
+  ENABLE_TG_MODULE: "false"
+  ENABLE_VK_MODULE: "true"
+
+  # VK database — ТО ЖЕ DSN что у VKParserService (единый parse-flow источник).
+  # host/port/user/password/db совпадают с backend/parsers/test/secret.yaml:DATABASE_URL.
+  # Таблица `groups` уже создана VKParserService; consumer делает upsert по id,
+  # пишет только name/screen_name/members_count, не трогает last_parsed_at.
+  VK_DB_HOST: "postgres.databases.svc.cluster.local"
+  VK_DB_PORT: "5432"
+  VK_DB_USER: "root"
+  VK_DB_NAME: "vkparser_db"
+
+  # Kafka / Redpanda
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+
+  VK_KAFKA_TOPIC: "vk_groups"
+  VK_KAFKA_GROUP_ID: "vk-group-consumer-test"
+
+  # Batch
+  BATCH_SIZE: "100"
+  BATCH_TIMEOUT: "5.0"

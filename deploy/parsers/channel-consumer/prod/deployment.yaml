@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tg-channel-consumer-prod
+  namespace: parsers
+  labels:
+    app: tg-channel-consumer-prod
+    version: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tg-channel-consumer-prod
+  template:
+    metadata:
+      labels:
+        app: tg-channel-consumer-prod
+        version: prod
+    spec:
+      containers:
+        - name: tg-channel-consumer-prod
+          image: ghcr.io/fatdataproduct/social-channel-consumer/tg-channel-consumer-prod:latest
+          imagePullPolicy: Always
+          command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: tg-channel-consumer-prod-configmap
+            - secretRef:
+                name: tg-channel-consumer-prod-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+      nodeSelector:
+        kubernetes.io/hostname: angron-node0
+      imagePullSecrets:
+        - name: ghcr-login-secret

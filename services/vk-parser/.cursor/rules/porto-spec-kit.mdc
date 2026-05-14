@@ -1,0 +1,102 @@
+---
+alwaysApply: true
+---
+# 🌱 Porto Spec Kit - Cursor Rules
+
+## 🎯 Porto Architecture Development Rules
+
+При разработке новых фич ВСЕГДА используй Porto Spec Kit методологию:
+
+### 📝 Spec-Driven Development Process
+1. **ВСЕГДА начинай с `/specify`** - создание спецификации фичи
+2. **Затем `/plan`** - планирование реализации с Porto компонентами
+3. **Потом `/tasks`** - генерация конкретных задач
+4. **Только после этого** - реализация по задачам
+
+### 🏗️ Porto Architecture Compliance
+- **Containers**: Размещай фичи в правильных контейнерах
+  - `AppSection/*` - основная бизнес-логика (User, Book, Order)
+  - `VendorSection/*` - внешние интеграции (Payment, Email, SMS)
+- **Actions**: Бизнес use cases, оркестрируют Tasks
+- **Tasks**: Атомарные операции, переиспользуемые
+- **Models**: Piccolo ORM модели с миграциями
+- **UI**: Litestar контроллеры, CLI команды, Web views
+
+### 🔧 Technology Stack (ОБЯЗАТЕЛЬНО)
+- **Framework**: Litestar 2.12+ only
+- **ORM**: Piccolo 1.22+ only
+- **DI**: Dishka 1.4+ only
+- **Observability**: Logfire 2.7+ only
+- **Validation**: Pydantic 2.9+ only
+
+### 📂 File Structure Rules
+```
+src/Containers/[Section]/[Container]/
+├── Actions/[Action]Action.py      # Бизнес use cases
+├── Tasks/[Task]Task.py           # Атомарные операции
+├── Models/[Model].py             # Piccolo ORM модели
+├── UI/API/Controllers/[Controller].py  # Litestar контроллеры
+├── Data/[DTO].py                 # Pydantic DTOs
+├── Exceptions/[Exception].py     # Исключения
+├── migrations/                   # Piccolo миграции
+├── PiccoloApp.py                # Piccolo конфигурация
+└── Providers.py                 # Dishka провайдеры
+```
+
+### 🧪 Testing Rules (NON-NEGOTIABLE)
+- **TDD ОБЯЗАТЕЛЬНО**: Тесты перед реализацией
+- **Порядок тестов**: Contract → Integration → Unit → E2E
+- **Реальные зависимости**: Используй настоящую БД, не моки
+- **Каждый Action** должен иметь интеграционный тест
+- **Каждый Task** должен иметь unit тест
+
+### 📋 Development Workflow
+1. **Читай спецификацию** из `specs/[###-feature]/spec.md`
+2. **Следуй плану** из `specs/[###-feature]/plan.md`
+3. **Выполняй задачи** из `specs/[###-feature]/tasks.md`
+4. **Используй Ship Parents**: наследуй от базовых классов
+5. **Регистрируй в DI**: добавляй в Providers.py
+6. **Добавляй логирование**: используй Logfire
+
+### 🚫 FORBIDDEN Practices
+- ❌ Прямое обращение к БД в Actions (только через Tasks)
+- ❌ Бизнес-логика в Tasks (только атомарные операции)
+- ❌ Реализация без тестов (TDD нарушение)
+- ❌ Обход DI (ручное создание объектов)
+- ❌ Игнорирование Ship компонентов
+- ❌ Создание кода без спецификации
+
+### 📚 Documentation & Resources
+- **Porto Spec Kit Docs**: `spec-kit/docs/`
+- **Templates**: `spec-kit/templates/`
+- **Constitution**: `spec-kit/memory/constitution-porto.md`
+- **Examples**: `spec-kit/examples/`
+- **Manual Usage**: `spec-kit/docs/manual-usage.md`
+
+### 🤖 AI Commands Available
+- `/specify [description]` - создать спецификацию фичи
+- `/plan [tech details]` - создать план реализации
+- `/tasks` - сгенерировать список задач
+
+### 🎯 Code Quality Standards
+- **Type hints**: 100% покрытие
+- **Docstrings**: Все публичные методы
+- **Naming**: Porto конвенции (`CreateUserAction`, `FindUserTask`)
+- **Error handling**: Porto исключения
+- **Performance**: <200ms для Actions, <50ms для Tasks
+
+### 🔍 Before Any Code Change
+1. **Проверь**: Есть ли спецификация для этой фичи?
+2. **Убедись**: Следуешь ли Porto архитектуре?
+3. **Валидируй**: Соответствует ли код конституции?
+4. **Тестируй**: Написаны ли тесты первыми?
+
+### 📖 When in Doubt
+- Читай `spec-kit/docs/manual-usage.md`
+- Изучай `spec-kit/templates/`
+- Следуй `spec-kit/memory/constitution-porto.md`
+- Смотри примеры в существующих Containers
+
+---
+
+💡 **Remember**: Porto Spec Kit не просто инструмент, это методология разработки. Следуй процессу полностью для получения максимальной пользы.

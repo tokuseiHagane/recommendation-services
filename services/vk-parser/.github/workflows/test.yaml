@@ -1,0 +1,85 @@
+name: Test Branch CI/CD
+on:
+  push:
+    branches:
+      - test-docker-legacy
+      - test
+
+env:
+  REGISTRY: ghcr.io
+  GHCR_ACTOR: tokuseiHagane
+  REPOSITORY: vkparserservice
+  IMAGE_NAME: vkparser-test
+  NAMESPACE: parsers
+  BUILD_ENV: prod
+
+jobs:
+  build-and-push:
+    runs-on: [self-hosted, Linux]
+    steps:
+      - name: Pre-cleanup workspace
+        run: |
+          echo "=== Cleaning workspace before checkout ==="
+          sudo rm -rf $PWD/* $PWD/.[!.]* 2>/dev/null || true
+          echo "=== Workspace cleaned ==="
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GHCR_ACTOR }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_ENV=${{ env.BUILD_ENV }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: deploy
+    steps:
+      - name: Deploy vkparser-test to Kubernetes
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "Deploying vkparser-test..."
+          ssh-agent bash -c "
+            ssh-add - <<< \"$SSH_KEY\"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+              -p ${{ secrets.SSH_PORT }} \
+              ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+              'kubectl rollout restart deployment/vkparser-test -n ${{ env.NAMESPACE }} && \
+               kubectl rollout status deployment/vkparser-test -n ${{ env.NAMESPACE }} --timeout=300s'
+          "
+          echo "vkparser-test deployed successfully"
+
+      - name: Deployment complete
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Deployment updated!"
+          echo "  vkparser-test"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

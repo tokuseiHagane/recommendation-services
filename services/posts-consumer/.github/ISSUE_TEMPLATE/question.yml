@@ -1,0 +1,170 @@
+name: ❓ Вопрос или Документация
+description: Задайте вопрос о проекте или предложите улучшение документации
+title: "[ВОПРОС]: "
+labels: ["question", "documentation"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Добро пожаловать! Мы рады помочь вам с вопросами о проекте.
+        
+        **Перед тем как задать вопрос, пожалуйста:**
+        - Проверьте [документацию](https://github.com/vladdd183/template/tree/main/docs)
+        - Поищите в [существующих issues](https://github.com/vladdd183/template/issues)
+        - Изучите [примеры кода](https://github.com/vladdd183/template/tree/main/examples)
+
+  - type: dropdown
+    id: question-type
+    attributes:
+      label: 🤔 Тип вопроса
+      description: Выберите тип вашего вопроса
+      options:
+        - "🤷 Как использовать функцию?"
+        - "🏗️ Вопрос об архитектуре Porto"
+        - "📚 Проблема с документацией"
+        - "💡 Предложение по улучшению документации"
+        - "🔧 Вопрос о настройке/конфигурации"
+        - "🐍 Вопрос о Python/Litestar/Piccolo/Dishka"
+        - "🚀 Вопрос о развертывании"
+        - "🧪 Вопрос о тестировании"
+        - "🔒 Вопрос о безопасности"
+        - "⚡ Вопрос о производительности"
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ Ваш вопрос
+      description: Четко и подробно опишите ваш вопрос
+      placeholder: Опишите ваш вопрос как можно подробнее...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: porto-component
+    attributes:
+      label: 🏗️ Компонент архитектуры (если применимо)
+      description: Если ваш вопрос касается конкретных компонентов Porto
+      options:
+        - label: Container
+        - label: Ship layer
+        - label: Action
+        - label: Task
+        - label: Model
+        - label: Repository
+        - label: Service Provider
+        - label: Controller
+        - label: Request/Response
+        - label: Middleware
+        - label: Command
+
+  - type: input
+    id: specific-area
+    attributes:
+      label: 🎯 Конкретная область
+      description: Укажите конкретную область, с которой у вас вопрос
+      placeholder: например, создание нового Container, настройка БД, API endpoint
+
+  - type: checkboxes
+    id: attempted-solutions
+    attributes:
+      label: 🔍 Что вы уже пробовали
+      description: Отметьте, что вы уже исследовали или попробовали
+      options:
+        - label: Прочитал документацию
+        - label: Искал в issues
+        - label: Изучил примеры кода
+        - label: Попробовал решение, но получил ошибку
+        - label: Спросил в обсуждениях
+
+  - type: textarea
+    id: attempted-code
+    attributes:
+      label: 💻 Попытки решения (код)
+      description: Если вы пробовали код, покажите что именно
+      placeholder: |
+        # Ваш код или попытка решения
+      render: python
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 💻 Окружение (если применимо)
+      description: Информация о вашем окружении
+      placeholder: |
+        ОС: Ubuntu 22.04
+        Python версия: 3.11
+        Litestar версия: 2.0.0
+        Piccolo ORM версия: 1.0.0
+      render: yaml
+
+  - type: textarea
+    id: expected-result
+    attributes:
+      label: 📊 Ожидаемый результат
+      description: Опишите, что вы хотите достичь или понять
+      placeholder: Что именно вы хотите получить в результате...
+
+  - type: checkboxes
+    id: documentation-issue
+    attributes:
+      label: 📚 Проблема с документацией (если применимо)
+      description: Если это касается документации, отметьте проблему
+      options:
+        - label: Информация отсутствует
+        - label: Информация неточная
+        - label: Примеры не работают
+        - label: Документация непонятна
+        - label: Документация устарела
+
+  - type: textarea
+    id: documentation-improvement
+    attributes:
+      label: 💡 Предлагаемые улучшения документации
+      description: Как можно улучшить документацию?
+      placeholder: Опишите, как можно улучшить документацию...
+
+  - type: checkboxes
+    id: help-contribution
+    attributes:
+      label: 🤝 Готовность помочь
+      description: Готовы ли вы помочь улучшить документацию?
+      options:
+        - label: Я готов помочь написать/улучшить документацию
+        - label: Я готов предоставить примеры
+        - label: Я готов протестировать обновления
+
+  - type: textarea
+    id: related-resources
+    attributes:
+      label: 🔗 Связанные ресурсы
+      description: Ссылки на документацию, статьи или другие ресурсы, которые вы изучали
+      placeholder: Список ресурсов...
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: 🎯 Срочность
+      description: Насколько срочен ваш вопрос?
+      options:
+        - Блокирует работу
+        - Нужен ответ в ближайшее время
+        - Может подождать
+        - Просто любопытство
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Подтверждение
+      description: Пожалуйста, подтвердите следующее
+      options:
+        - label: Я проверил документацию перед тем как задать вопрос
+          required: true
+        - label: Я искал ответ в существующих issues
+          required: true
+        - label: Мой вопрос достаточно детализирован
+          required: true

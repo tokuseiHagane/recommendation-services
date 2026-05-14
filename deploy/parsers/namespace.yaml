@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: parsers
+  labels:
+    name: parsers
+    purpose: parsing-services

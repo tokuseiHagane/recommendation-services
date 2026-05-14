@@ -1,0 +1,88 @@
+---
+name: AI Task
+about: Create a task for AI agent to work on
+title: '[AI] '
+labels: ['ai-task']
+assignees: ''
+---
+
+## 🤖 AI Task Configuration
+
+**Model**: claude-3-opus-20240229
+**Branch**: auto-generated
+**Type**: <!-- feature|bugfix|research|refactor -->
+**Priority**: <!-- high|medium|low -->
+
+## 📋 Task Description
+
+<!-- Четкое описание того, что нужно сделать -->
+
+### Expected Outcome
+<!-- Что должно получиться в результате -->
+
+### Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## 🏗️ Porto Architecture Context
+
+### Affected Containers
+<!-- Какие контейнеры будут затронуты -->
+- [ ] User
+- [ ] Book
+- [ ] Order
+- [ ] Other: ________
+
+### Component Types Needed
+- [ ] Actions (orchestration)
+- [ ] Tasks (atomic operations)
+- [ ] Models (data entities)
+- [ ] Controllers (HTTP handlers)
+- [ ] Exceptions (error handling)
+
+## 🔧 Technical Details
+
+### Dependencies
+<!-- Внешние зависимости или ограничения -->
+
+### Performance Requirements
+<!-- Требования к производительности, если есть -->
+
+### Security Considerations
+<!-- Соображения безопасности, если применимо -->
+
+## 🧪 Testing Strategy
+
+### Test Types Required
+- [ ] Unit tests for Tasks
+- [ ] Integration tests for Actions
+- [ ] API tests for Controllers
+- [ ] E2E tests for complete flows
+
+### Test Scenarios
+<!-- Основные сценарии для тестирования -->
+
+## ⚠️ Constraints and Limitations
+
+### Technical Constraints
+<!-- Технические ограничения -->
+
+### Business Constraints
+<!-- Бизнес-ограничения -->
+
+### AI Agent Guidelines
+- [ ] Follow Porto single responsibility
+- [ ] Use only approved tech stack (Litestar, Piccolo, Dishka)
+- [ ] Create specification before implementation
+- [ ] Write tests before code
+- [ ] Maximum 3 files per change
+
+## 📚 References
+
+<!-- Ссылки на документацию, примеры, etc. -->
+
+---
+
+**For AI Agent**: 
+This task follows Porto + Spec-Kit methodology. Start with creating a specification, then implementation plan, then test-first development. Ask for clarification if any requirements are unclear.

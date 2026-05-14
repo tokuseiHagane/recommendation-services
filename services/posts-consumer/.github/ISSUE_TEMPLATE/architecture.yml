@@ -1,0 +1,220 @@
+name: 🏗️ Архитектурное изменение
+description: Предложите изменение в архитектуре проекта Porto
+title: "[АРХИТЕКТУРА]: "
+labels: ["architecture", "breaking change", "needs discussion"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🚨 **Внимание:** Архитектурные изменения могут существенно повлиять на проект!
+        
+        Пожалуйста, тщательно опишите предлагаемые изменения и их обоснование.
+
+  - type: textarea
+    id: change-description
+    attributes:
+      label: 🎯 Описание архитектурного изменения
+      description: Четкое и краткое описание предлагаемого архитектурного изменения
+      placeholder: Опишите что именно предлагается изменить в архитектуре...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 🤔 Мотивация
+      description: Почему это изменение необходимо? Какие проблемы оно решает?
+      placeholder: Объясните причины изменения...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: container-layer
+    attributes:
+      label: 📦 Container Layer
+      description: Затрагиваемые компоненты Container Layer
+      options:
+        - label: Структура Containers
+        - label: Container dependencies
+        - label: Новые Containers
+        - label: Изменение существующих Containers
+
+  - type: checkboxes
+    id: ship-layer
+    attributes:
+      label: 🚢 Ship Layer
+      description: Затрагиваемые компоненты Ship Layer
+      options:
+        - label: Core компоненты
+        - label: Service Providers
+        - label: Middleware
+        - label: Commands
+        - label: Configs
+        - label: Parents (базовые классы)
+
+  - type: checkboxes
+    id: business-logic
+    attributes:
+      label: 🏢 Business Logic
+      description: Затрагиваемые бизнес-компоненты
+      options:
+        - label: Actions
+        - label: Tasks
+        - label: Models
+        - label: Repositories
+        - label: Value Objects
+        - label: Events
+
+  - type: checkboxes
+    id: infrastructure
+    attributes:
+      label: 🏗️ Infrastructure
+      description: Затрагиваемые инфраструктурные компоненты
+      options:
+        - label: Database (Piccolo ORM)
+        - label: Dependency Injection (Dishka)
+        - label: Web Framework (Litestar)
+        - label: Messaging (FastStream)
+        - label: Logging (Logfire)
+        - label: Docker/Development
+
+  - type: textarea
+    id: current-architecture
+    attributes:
+      label: 📋 Текущая архитектура
+      description: Опишите текущую реализацию
+      placeholder: |
+        # Опишите текущую реализацию
+      render: python
+
+  - type: textarea
+    id: proposed-architecture
+    attributes:
+      label: 💡 Предлагаемая архитектура
+      description: Опишите новую реализацию
+      placeholder: |
+        # Опишите новую реализацию
+      render: python
+
+  - type: textarea
+    id: migration-path
+    attributes:
+      label: 🛤️ Миграционный путь
+      description: Как осуществить переход к новой архитектуре?
+      placeholder: |
+        1. Шаг 1: ...
+        2. Шаг 2: ...
+        3. Шаг 3: ...
+
+  - type: checkboxes
+    id: breaking-changes
+    attributes:
+      label: 💥 Breaking Changes
+      description: Тип изменений
+      options:
+        - label: Это breaking change
+        - label: Изменения обратно совместимы
+        - label: Требуется миграция данных
+        - label: Требуются изменения в API
+
+  - type: textarea
+    id: breaking-details
+    attributes:
+      label: ⚠️ Детали Breaking Changes
+      description: Опишите все breaking changes
+      placeholder: Список всех breaking changes...
+
+  - type: checkboxes
+    id: testing-plan
+    attributes:
+      label: 🧪 План тестирования
+      description: Необходимые типы тестов
+      options:
+        - label: Unit тесты
+        - label: Integration тесты
+        - label: Performance тесты
+        - label: Backward compatibility тесты
+
+  - type: dropdown
+    id: performance-impact
+    attributes:
+      label: 📊 Влияние на производительность
+      description: Как изменение повлияет на производительность?
+      options:
+        - Улучшает производительность
+        - Нейтральное влияние
+        - Может снизить производительность
+        - Требует анализа производительности
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🎨 Альтернативные решения
+      description: Опишите рассмотренные альтернативы и почему они не подходят
+      placeholder: Рассмотренные альтернативы...
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: 📋 Критерии приемки
+      description: Критерии готовности изменения
+      options:
+        - label: Архитектурное решение согласовано
+        - label: Код соответствует принципам Porto
+        - label: Добавлены/обновлены тесты
+        - label: Обновлена документация
+        - label: Проведен код ревью
+        - label: Проверена совместимость
+        - label: Добавлены миграции (если нужно)
+
+  - type: checkboxes
+    id: documentation-updates
+    attributes:
+      label: 📚 Обновления документации
+      description: Какая документация потребует обновления
+      options:
+        - label: README
+        - label: API документация
+        - label: Архитектурная документация
+        - label: Примеры использования
+        - label: Руководство по миграции
+
+  - type: dropdown
+    id: release-plan
+    attributes:
+      label: 🚀 План релиза
+      description: Как должно быть выпущено изменение?
+      options:
+        - Можно включить в минорную версию
+        - Требует мажорную версию
+        - Требует pre-release тестирование
+        - Требует постепенный rollout
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: discussion-needed
+    attributes:
+      label: 👥 Требуется обсуждение
+      description: С кем нужно обсудить изменения?
+      options:
+        - label: С архитектором проекта
+        - label: С командой разработки
+        - label: С сообществом
+        - label: С пользователями API
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Подтверждение
+      description: Пожалуйста, подтвердите следующее
+      options:
+        - label: Я понимаю что это серьезное архитектурное изменение
+          required: true
+        - label: Я готов участвовать в обсуждении и реализации
+          required: true
+        - label: Я рассмотрел альтернативные подходы
+          required: true

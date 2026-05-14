@@ -1,0 +1,184 @@
+name: ✨ Запрос новой функции
+description: Предложите новую функцию для проекта
+title: "[ФУНКЦИЯ]: "
+labels: ["enhancement", "needs discussion"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за предложение новой функции! 
+        Пожалуйста, заполните форму ниже чтобы помочь нам понять ваше предложение.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: 🎯 Описание функции
+      description: Четкое и краткое описание того, что вы хотите добавить
+      placeholder: Опишите предлагаемую функцию...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: 💡 Проблема/Потребность
+      description: Четкое и краткое описание проблемы, которую решает эта функция
+      placeholder: Например, "Я всегда расстраиваюсь, когда..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: 💭 Предлагаемое решение
+      description: Четкое и краткое описание того, что вы хотите реализовать
+      placeholder: Опишите ваше решение...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: porto-containers
+    attributes:
+      label: 📦 Containers
+      description: Какие Containers будут затронуты?
+      options:
+        - label: Новый Container
+        - label: Изменение существующего Container
+
+  - type: input
+    id: specific-container
+    attributes:
+      label: 🎯 Конкретный Container
+      description: Если изменение существующего, укажите какого
+      placeholder: например, AppSection/User
+
+  - type: checkboxes
+    id: ship-layer
+    attributes:
+      label: 🚢 Ship Layer
+      description: Какие компоненты Ship слоя будут затронуты?
+      options:
+        - label: Новый Service Provider
+        - label: Новый Middleware
+        - label: Изменение Core компонентов
+        - label: Новая Command
+        - label: Изменение конфигурации
+
+  - type: checkboxes
+    id: business-logic
+    attributes:
+      label: 🏢 Business Logic
+      description: Какие бизнес-компоненты будут затронуты?
+      options:
+        - label: Новый Action
+        - label: Новый Task
+        - label: Изменение существующего Action/Task
+
+  - type: checkboxes
+    id: data-layer
+    attributes:
+      label: 🗃️ Data Layer
+      description: Какие компоненты данных будут затронуты?
+      options:
+        - label: Новая Piccolo Model
+        - label: Изменение существующей Model
+        - label: Новая миграция БД
+        - label: Новый Repository
+
+  - type: checkboxes
+    id: api-layer
+    attributes:
+      label: 🌐 API Layer
+      description: Какие API компоненты будут затронуты?
+      options:
+        - label: Новый Litestar Controller
+        - label: Новый Request класс
+        - label: Новый Response/Transformer
+        - label: Изменение существующего endpoint
+
+  - type: checkboxes
+    id: infrastructure
+    attributes:
+      label: 🏗️ Infrastructure
+      description: Какие инфраструктурные компоненты будут затронуты?
+      options:
+        - label: Новый Dishka Provider
+        - label: FastStream интеграция
+        - label: Logfire настройки
+        - label: Docker изменения
+
+  - type: textarea
+    id: implementation-details
+    attributes:
+      label: 🔧 Детали реализации
+      description: Опишите, как вы видите техническую реализацию
+      placeholder: |
+        Пример кода, структура классов, API endpoints и т.д.
+      render: python
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 📋 Критерии приемки
+      description: Как мы поймем, что функция готова?
+      placeholder: |
+        - [ ] Функция реализована согласно архитектуре Porto
+        - [ ] Добавлены тесты
+        - [ ] Обновлена документация
+        - [ ] ...
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🎨 Альтернативы
+      description: Описание любых альтернативных решений, которые вы рассматривали
+      placeholder: Рассмотренные альтернативы...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Приоритет
+      description: Оцените важность функции
+      options:
+        - Критический (блокирует развитие)
+        - Высокий (важная функция)
+        - Средний (полезная функция)
+        - Низкий (nice to have)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: 🚀 Готовность к разработке
+      description: Готов ли запрос к реализации?
+      options:
+        - label: Требования полностью определены
+        - label: Архитектурное решение понятно
+        - label: Зависимости выявлены
+        - label: Готов к реализации
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 🤝 Участие
+      description: Ваше участие в реализации
+      options:
+        - label: Я готов помочь с реализацией
+        - label: Я готов написать тесты
+        - label: Я готов помочь с документацией
+        - label: Я готов протестировать решение
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Подтверждение
+      description: Пожалуйста, подтвердите следующее
+      options:
+        - label: Я искал похожие предложения в существующих issues
+          required: true
+        - label: Я понимаю принципы архитектуры Porto
+          required: true
+        - label: Предложение соответствует целям проекта
+          required: true

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tg-posts-consumer-prod-configmap
+  namespace: parsers
+  labels:
+    app: tg-posts-consumer-prod
+    provider: telegram
+    version: prod
+data:
+  APP_NAME: "tg-posts-consumer"
+  ENV: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+
+  DB_HOST: "postgres-prod.databases.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_USER: "root"
+  DB_NAME: "tg_posts_prod"
+
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+
+  KAFKA_CHANNELS_DIFF_TOPIC: "tg_channels_diff"
+  KAFKA_POSTS_TOPIC_PREFIX: "tg_posts_"
+  KAFKA_GROUP_ID_PREFIX: "tg-posts-consumer-prod"
+
+  BATCH_SIZE: "100"
+  BATCH_TIMEOUT_MS: "10000"
+  CACHE_TTL_SECONDS: "300"
+  CONSUMER_TIMEOUT_MS: "1000"
+  AUTO_OFFSET_RESET: "earliest"

@@ -1,0 +1,130 @@
+services:
+  # =============================================================================
+  # TgPost Service - Telegram Posts Consumer (Distributed Monolith)
+  # =============================================================================
+  tg-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tg-post-consumer
+    ports:
+      - "8002:8000"
+    environment:
+      # Service Type
+      - SERVICE=tg
+      
+      # App
+      - ENV=development
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      
+      # Database (PostgreSQL) - Telegram database
+      - DB_HOST=tg-channel-db
+      - DB_PORT=5432
+      - DB_USER=app_user
+      - DB_PASSWORD=app_password
+      - DB_NAME=telegram
+      
+      # Kafka Settings
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+      
+      # TgPost Specific Settings
+      - KAFKA_GROUP_ID_PREFIX=posts-consumer-group
+      - BATCH_SIZE=100
+      - BATCH_TIMEOUT_MS=10000
+      - CACHE_TTL_SECONDS=300
+      - CONSUMER_TIMEOUT_MS=1000
+      - AUTO_OFFSET_RESET=earliest
+      
+      # Kafka Topics
+      - KAFKA_CHANNELS_DIFF_TOPIC=tg_channels_diff
+      - KAFKA_POSTS_TOPIC_PREFIX=tg_posts_
+      
+      # Logfire (optional)
+      - LOGFIRE_IGNORE_NO_CONFIG=1
+      
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./specs:/app/specs
+    restart: unless-stopped
+    command: ["python", "-m", "src.BootstrapTg"]
+    networks:
+      - tg-post-network
+      - kafka-network
+
+  # =============================================================================
+  # VkPost Service - VK Posts Consumer (Distributed Monolith)
+  # =============================================================================
+  vk-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vk-post-consumer
+    ports:
+      - "8003:8000"
+    environment:
+      # Service Type
+      - SERVICE=vk
+      
+      # App
+      - ENV=development
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      
+      # VK Database (PostgreSQL) - separate VK database
+      - VK_DB_HOST=vk-group-db
+      - VK_DB_PORT=5432
+      - VK_DB_USER=app_user
+      - VK_DB_PASSWORD=app_password
+      - VK_DB_NAME=vk
+      
+      # Also set DB_* for compatibility (used by entrypoint)
+      - DB_HOST=vk-group-db
+      - DB_PORT=5432
+      - DB_USER=app_user
+      - DB_PASSWORD=app_password
+      - DB_NAME=vk
+      
+      # Kafka Settings
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+      
+      # VkPost Specific Settings
+      - KAFKA_GROUP_ID_PREFIX=vk-posts-consumer-group
+      - BATCH_SIZE=100
+      - BATCH_TIMEOUT_MS=10000
+      - CACHE_TTL_SECONDS=300
+      - CONSUMER_TIMEOUT_MS=1000
+      - AUTO_OFFSET_RESET=earliest
+      
+      # Kafka Topics (VK specific)
+      - KAFKA_GROUPS_DIFF_TOPIC=vk_groups_diff
+      - KAFKA_POSTS_TOPIC_PREFIX=vk_posts_
+      
+      # Logfire (optional)
+      - LOGFIRE_IGNORE_NO_CONFIG=1
+      
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./specs:/app/specs
+    restart: unless-stopped
+    command: ["python", "-m", "src.BootstrapVk"]
+    networks:
+      - vk-post-network
+      - kafka-network
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  tg-post-network:
+    name: tg-post-network
+    external: true  # Created by external docker-compose
+  vk-post-network:
+    name: vk-post-network
+    external: true  # Created by external docker-compose (VK infrastructure)
+  kafka-network:
+    name: kafka-network
+    external: true

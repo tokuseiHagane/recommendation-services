@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "litestar>=2.15",
     "piccolo[all]>=1.25",
-    "opensearch-py>=2.8",
+    "opensearch-py[async]>=2.8",
     "apscheduler>=3.10",
     "dishka>=1.5",
     "pydantic-settings>=2.7",

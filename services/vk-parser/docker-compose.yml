@@ -1,0 +1,143 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        BUILD_ENV: dev
+    container_name: vk-parser-service
+    ports:
+      - "8000:8000"
+    environment:
+      # Application
+      - APP_NAME=${APP_NAME:-vk-parser-service}
+      - APP_ENV=${APP_ENV:-development}
+      - APP_DEBUG=${APP_DEBUG:-true}
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+      # API Configuration
+      - API_VERSION=${API_VERSION:-v1}
+      - SERVICE_NAME=${SERVICE_NAME:-vk}
+      # Database
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/vkparser_db
+      - POSTGRES_DB=vkparser_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      # Redis
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_DEFAULT_TTL=${REDIS_DEFAULT_TTL:-86400}
+      # Security
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-jwt-secret-here}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      # VK API
+      - VK_ACCESS_TOKEN=${VK_ACCESS_TOKEN}
+      # Kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_GROUPS_TOPIC=${KAFKA_GROUPS_TOPIC:-vk_groups}
+      - KAFKA_POSTS_TOPIC_PREFIX=${KAFKA_POSTS_TOPIC_PREFIX:-vk_posts_}
+      # Logfire
+      - LOGFIRE_TOKEN=${LOGFIRE_TOKEN}
+      - LOGFIRE_PROJECT_NAME=${LOGFIRE_PROJECT_NAME:-vk-parser-service}
+      - LOGFIRE_ENVIRONMENT=${LOGFIRE_ENVIRONMENT:-development}
+      - LOGFIRE_LOG_LEVEL=${LOGFIRE_LOG_LEVEL:-DEBUG}
+      - LOGFIRE_SAMPLE_RATE=${LOGFIRE_SAMPLE_RATE:-1.0}
+      # CORS
+      - CORS_ALLOW_ORIGINS=${CORS_ALLOW_ORIGINS:-["http://localhost:8000"]}
+      - CORS_ALLOW_CREDENTIALS=${CORS_ALLOW_CREDENTIALS:-true}
+      - CORS_ALLOW_METHODS=${CORS_ALLOW_METHODS:-["*"]}
+      - CORS_ALLOW_HEADERS=${CORS_ALLOW_HEADERS:-["*"]}
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+    command: python -m src.Bootstrap
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - vkparser-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: vkparser-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=vkparser_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vkparser-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vkparser_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: vkparser-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - vkparser-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: vkparser-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    networks:
+      - vkparser-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: vkparser-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - vkparser-network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:29092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  redis_data:
+  zookeeper_data:
+  kafka_data:
+
+networks:
+  vkparser-network:
+    driver: bridge

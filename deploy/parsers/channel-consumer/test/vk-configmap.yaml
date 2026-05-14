@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vk-channel-consumer-test-configmap
+  namespace: parsers
+  labels:
+    app: vk-channel-consumer-test
+    provider: vk
+    version: test
+data:
+  APP_NAME: "vk-channel-consumer"
+  ENV: "test"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+
+  ENABLE_TG_MODULE: "false"
+  ENABLE_VK_MODULE: "true"
+
+  VK_DB_HOST: "postgres.databases.svc.cluster.local"
+  VK_DB_PORT: "5432"
+  VK_DB_USER: "root"
+  VK_DB_NAME: "vkparser_db"
+
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+
+  VK_KAFKA_TOPIC: "vk_groups"
+  VK_KAFKA_GROUP_ID: "vk-channel-consumer-test"
+
+  BATCH_SIZE: "100"
+  BATCH_TIMEOUT: "5.0"

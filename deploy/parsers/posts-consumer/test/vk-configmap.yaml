@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vk-posts-consumer-test-configmap
+  namespace: parsers
+  labels:
+    app: vk-posts-consumer-test
+    provider: vk
+    version: test
+data:
+  APP_NAME: "vk-posts-consumer"
+  ENV: "test"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+
+  # VK posts database — ТО ЖЕ DSN что у VKParserService (единый parse-flow источник).
+  # host/port/user/password/db совпадают с backend/parsers/test/secret.yaml:DATABASE_URL.
+  # Таблицы `posts` и `groups` уже созданы VKParserService — сам consumer только
+  # пишет upsert'ы по id.
+  #
+  # ВАЖНО: перед первым apply Deployment'а применить vk-migrate-fake-job.yaml,
+  # иначе entrypoint.sh упадёт на `piccolo migrations forwards VkPost` с
+  # ошибкой `relation "posts" already exists`. См. README.
+  #
+  # entrypoint.sh при SERVICE=vk экспортирует VK_DB_* -> DB_* для миграций;
+  # приложение BootstrapVk читает VK_DB_* напрямую из Settings.
+  VK_DB_HOST: "postgres.databases.svc.cluster.local"
+  VK_DB_PORT: "5432"
+  VK_DB_USER: "root"
+  VK_DB_NAME: "vkparser_db"
+
+  # Kafka / Redpanda
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+
+  KAFKA_GROUPS_DIFF_TOPIC: "vk_groups_diff"
+  KAFKA_POSTS_TOPIC_PREFIX: "vk_posts_"
+  KAFKA_GROUP_ID_PREFIX: "vk-posts-consumer-test"
+
+  # Processing
+  BATCH_SIZE: "100"
+  BATCH_TIMEOUT_MS: "10000"
+  CACHE_TTL_SECONDS: "300"
+  CONSUMER_TIMEOUT_MS: "1000"
+  AUTO_OFFSET_RESET: "earliest"

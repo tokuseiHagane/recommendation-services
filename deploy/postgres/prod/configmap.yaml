@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-prod-configmap
+  namespace: databases
+  labels:
+    app: postgres-prod
+data:
+  postgres-dbname: main

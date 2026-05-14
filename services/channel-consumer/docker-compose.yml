@@ -1,0 +1,119 @@
+services:
+  # ============================================
+  # Telegram Database (PostgreSQL)
+  # ============================================
+  tg_db:
+    image: postgres:17
+    container_name: tg-channel-db
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: telegram
+    volumes:
+      - tg_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - social-consumer-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d telegram"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # VK Database (PostgreSQL) - SEPARATE DATABASE
+  # ============================================
+  vk_db:
+    image: postgres:17
+    container_name: vk-group-db
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: vk
+    volumes:
+      - vk_db_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - social-consumer-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d vk"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Social Channel Consumer (Distributed Monolith)
+  # ============================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vk-channel-consumer
+    ports:
+      - "8000:8000"
+    environment:
+      # App
+      - ENV=development
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - BATCH_SIZE=100
+      - BATCH_TIMEOUT=5.0
+      
+      # Module toggles
+      - ENABLE_TG_MODULE=true
+      - ENABLE_VK_MODULE=true
+      
+      # Telegram Database
+      - TG_DB_HOST=tg_db
+      - TG_DB_PORT=5432
+      - TG_DB_USER=app_user
+      - TG_DB_PASSWORD=app_password
+      - TG_DB_NAME=telegram
+      
+      # VK Database (SEPARATE)
+      - VK_DB_HOST=vk_db
+      - VK_DB_PORT=5432
+      - VK_DB_USER=app_user
+      - VK_DB_PASSWORD=app_password
+      - VK_DB_NAME=vk
+      
+      # Kafka
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+      
+      # Telegram Kafka
+      - TG_KAFKA_TOPIC=tg_channels
+      - TG_KAFKA_GROUP_ID=tg-channel-consumer
+      
+      # VK Kafka
+      - VK_KAFKA_TOPIC=vk_groups
+      - VK_KAFKA_GROUP_ID=vk-group-consumer
+      
+    volumes:
+      - ./src:/app/src
+      - ./app.py:/app/app.py
+      - ./piccolo_conf.py:/app/piccolo_conf.py
+      - ./piccolo_conf_vk.py:/app/piccolo_conf_vk.py
+    command: >
+      uvicorn app:app --host 0.0.0.0 --port 8000 --workers 1
+    depends_on:
+      tg_db:
+        condition: service_healthy
+      vk_db:
+        condition: service_healthy
+    networks:
+      - social-consumer-network
+      - kafka-network
+
+volumes:
+  tg_db_data:
+  vk_db_data:
+
+networks:
+  social-consumer-network:
+    name: social-consumer-network
+    driver: bridge
+  kafka-network:
+    name: kafka-network
+    external: true

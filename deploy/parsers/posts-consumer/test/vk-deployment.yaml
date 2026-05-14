@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-posts-consumer-test
+  namespace: parsers
+  labels:
+    app: vk-posts-consumer-test
+    component: posts-consumer
+    provider: vk
+    version: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-posts-consumer-test
+  template:
+    metadata:
+      labels:
+        app: vk-posts-consumer-test
+        component: posts-consumer
+        provider: vk
+        version: test
+    spec:
+      containers:
+        - name: vk-posts-consumer-test
+          image: ghcr.io/fatdataproduct/social-posts-consumer/posts-consumer-test:latest
+          imagePullPolicy: Always
+          command: ["/docker-entrypoint.sh"]
+          args: ["python", "-m", "src.BootstrapVk"]
+          env:
+            - name: SERVICE
+              value: "vk"
+          envFrom:
+            - configMapRef:
+                name: vk-posts-consumer-test-configmap
+            - secretRef:
+                name: vk-posts-consumer-test-secret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+      nodeSelector:
+        kubernetes.io/hostname: angron-node0
+      imagePullSecrets:
+        - name: ghcr-login-secret

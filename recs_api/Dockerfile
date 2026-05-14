@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock* ./
 COPY shared/ ./shared/
 COPY recs_api/pyproject.toml ./recs_api/
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --no-dev
 
 FROM base AS runtime
 

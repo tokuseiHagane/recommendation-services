@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redpanda-pv
+  namespace: redpanda
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/storage
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/worker
+          operator: In
+          values:
+          - worker
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redpanda-pvc
+  namespace: redpanda
+spec:
+  storageClassName: "local-storage"
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

@@ -1,0 +1,39 @@
+[project]
+name = "tg-channel-consumer"
+version = "0.1.0"
+description = "Telegram Channel Consumer with Kafka, Litestar, Piccolo ORM, Porto architecture"
+requires-python = ">=3.11"
+readme = "README.md"
+authors = [{name = "MikhailOk", email = "mikhail.okhapkin@yandex.ru"}]
+
+dependencies = [
+  "litestar>=2.12.0",
+  "pydantic>=2.9.0",
+  "pydantic-settings>=2.5.2",
+  "piccolo>=1.22.0",
+  "asyncpg>=0.29.0",
+  "aiokafka>=0.10.0",
+  "kafka-python-ng>=2.2.0",
+  "uvicorn>=0.30.0",
+  "dishka>=1.4.0",
+  "logfire>=2.7.0",
+  "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "ruff", "mypy"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.py"]
+
+

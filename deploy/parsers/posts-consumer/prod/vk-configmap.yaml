@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vk-posts-consumer-prod-configmap
+  namespace: parsers
+  labels:
+    app: vk-posts-consumer-prod
+    provider: vk
+    version: prod
+data:
+  APP_NAME: "vk-posts-consumer"
+  ENV: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+
+  VK_DB_HOST: "postgres-prod.databases.svc.cluster.local"
+  VK_DB_PORT: "5432"
+  VK_DB_USER: "root"
+  VK_DB_NAME: "vk_posts_prod"
+
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+
+  KAFKA_GROUPS_DIFF_TOPIC: "vk_groups_diff"
+  KAFKA_POSTS_TOPIC_PREFIX: "vk_posts_"
+  KAFKA_GROUP_ID_PREFIX: "vk-posts-consumer-prod"
+
+  BATCH_SIZE: "100"
+  BATCH_TIMEOUT_MS: "10000"
+  CACHE_TTL_SECONDS: "300"
+  CONSUMER_TIMEOUT_MS: "1000"
+  AUTO_OFFSET_RESET: "earliest"

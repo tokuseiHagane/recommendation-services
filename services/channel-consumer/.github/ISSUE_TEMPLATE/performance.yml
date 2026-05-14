@@ -1,0 +1,224 @@
+name: ⚡ Проблема производительности
+description: Сообщите о проблеме производительности или предложите оптимизацию
+title: "[ПРОИЗВОДИТЕЛЬНОСТЬ]: "
+labels: ["performance", "optimization"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🚀 **Помогите нам улучшить производительность!**
+        
+        Пожалуйста, предоставьте как можно больше деталей для анализа проблемы производительности.
+
+  - type: textarea
+    id: performance-description
+    attributes:
+      label: 🎯 Описание проблемы производительности
+      description: Четкое и краткое описание проблемы с производительностью
+      placeholder: Опишите проблему производительности...
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-metrics
+    attributes:
+      label: 📊 Текущие метрики
+      description: Предоставьте текущие показатели производительности
+      placeholder: |
+        Время отклика: X мс/с
+        Пропускная способность: X RPS
+        Использование CPU: X%
+        Использование Memory: X MB
+        Database queries: X запросов/с
+      render: yaml
+
+  - type: textarea
+    id: expected-metrics
+    attributes:
+      label: 🎯 Ожидаемые метрики
+      description: Какие показатели вы хотите достичь?
+      placeholder: |
+        Время отклика: Y мс/с
+        Пропускная способность: Y RPS
+        Использование CPU: Y%
+        Использование Memory: Y MB
+      render: yaml
+
+  - type: checkboxes
+    id: database-issues
+    attributes:
+      label: 🗃️ Database (Piccolo ORM)
+      description: Проблемы с базой данных
+      options:
+        - label: Медленные запросы
+        - label: N+1 problem
+        - label: Отсутствующие индексы
+        - label: Неоптимальные отношения
+        - label: Проблемы с миграциями
+
+  - type: checkboxes
+    id: application-issues
+    attributes:
+      label: 🏢 Application Layer
+      description: Проблемы на уровне приложения
+      options:
+        - label: Медленные Actions
+        - label: Неэффективные Tasks
+        - label: Проблемы с Repositories
+        - label: Медленная бизнес-логика
+
+  - type: checkboxes
+    id: web-issues
+    attributes:
+      label: 🌐 Web Layer (Litestar)
+      description: Проблемы на уровне веб-слоя
+      options:
+        - label: Медленные endpoints
+        - label: Проблемы с middleware
+        - label: Сериализация/десериализация
+        - label: Статические файлы
+
+  - type: checkboxes
+    id: infrastructure-issues
+    attributes:
+      label: 🏗️ Infrastructure
+      description: Инфраструктурные проблемы
+      options:
+        - label: Dependency Injection (Dishka)
+        - label: Messaging (FastStream)
+        - label: Logging (Logfire)
+        - label: Container startup time
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 🔧 Воспроизведение
+      description: Как воспроизвести проблему производительности?
+      placeholder: |
+        1. Настроить окружение: ...
+        2. Загрузить тестовые данные: ...
+        3. Выполнить операцию: ...
+        4. Измерить время: ...
+
+  - type: textarea
+    id: test-data
+    attributes:
+      label: 📋 Тестовые данные
+      description: Какой объем данных нужен для воспроизведения?
+      placeholder: Опишите объем и тип тестовых данных...
+
+  - type: textarea
+    id: load-testing-commands
+    attributes:
+      label: 🧪 Команды нагрузочного тестирования
+      description: Команды для воспроизведения нагрузки
+      placeholder: |
+        # Команды для нагрузочного тестирования
+        wrk -t12 -c400 -d30s http://localhost:8000/api/endpoint
+      render: shell
+
+  - type: checkboxes
+    id: proposed-optimizations
+    attributes:
+      label: 💡 Предлагаемые оптимизации
+      description: Какие оптимизации вы предлагаете?
+      options:
+        - label: Database оптимизации (индексы, запросы)
+        - label: Кэширование результатов
+        - label: Асинхронная обработка
+        - label: Batch processing
+        - label: Lazy loading
+        - label: Memory optimization
+        - label: Redis caching
+        - label: CDN для статических файлов
+        - label: Connection pooling
+
+  - type: textarea
+    id: benchmark-code
+    attributes:
+      label: 🧪 Benchmark код
+      description: Код для тестирования производительности
+      placeholder: |
+        import time
+        import asyncio
+
+        async def benchmark_function():
+            start = time.time()
+            # ваш код
+            end = time.time()
+            return end - start
+      render: python
+
+  - type: checkboxes
+    id: success-criteria
+    attributes:
+      label: 🎯 Критерии успеха
+      description: Как определить что оптимизация удалась?
+      options:
+        - label: Время отклика улучшено на X%
+        - label: Пропускная способность увеличена на X%
+        - label: Использование памяти снижено на X%
+        - label: CPU загрузка снижена на X%
+
+  - type: checkboxes
+    id: monitoring-metrics
+    attributes:
+      label: 📊 Метрики для мониторинга
+      description: Какие метрики нужно отслеживать?
+      options:
+        - label: Response time
+        - label: Throughput
+        - label: Error rate
+        - label: Resource utilization
+        - label: Database performance
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 💻 Окружение
+      description: Информация об окружении
+      placeholder: |
+        ОС: Ubuntu 22.04
+        Python: 3.11
+        Hardware: CPU, RAM, Storage
+        Database: SQLite/PostgreSQL версия
+        Load: concurrent users, data volume
+      render: yaml
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Приоритет
+      description: Насколько критична проблема производительности?
+      options:
+        - Критический (блокирует продакшн)
+        - Высокий (существенно влияет на UX)
+        - Средний (заметно влияет)
+        - Низкий (оптимизация на будущее)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-results
+    attributes:
+      label: 📈 Ожидаемые результаты
+      description: Какие улучшения ожидаются после оптимизации?
+      placeholder: |
+        После оптимизации ожидаем:
+        - Улучшение времени отклика на X%
+        - Увеличение пропускной способности на X%
+        - Снижение использования ресурсов на X%
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Подтверждение
+      description: Пожалуйста, подтвердите следующее
+      options:
+        - label: Я провел предварительный анализ производительности
+          required: true
+        - label: Я готов предоставить дополнительные данные для анализа
+          required: true
+        - label: Я понимаю что оптимизация может потребовать существенных изменений
+          required: true

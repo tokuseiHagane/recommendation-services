@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vkparser-prod
+  namespace: parsers
+  labels:
+    app: vkparser-prod
+    version: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vkparser-prod
+  template:
+    metadata:
+      labels:
+        app: vkparser-prod
+        version: prod
+    spec:
+      initContainers:
+        - name: migrations
+          image: ghcr.io/fatdataproduct/vkparserservice/vkparser-prod:latest
+          imagePullPolicy: Always
+          command: ["python", "scripts/migrate.py"]
+          envFrom:
+            - configMapRef:
+                name: vkparser-prod-configmap
+            - secretRef:
+                name: vkparser-prod-secret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      containers:
+        - name: vkparser-prod
+          image: ghcr.io/fatdataproduct/vkparserservice/vkparser-prod:latest
+          imagePullPolicy: Always
+          command: ["python", "-m", "src.Bootstrap"]
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: vkparser-prod-configmap
+            - secretRef:
+                name: vkparser-prod-secret
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+      nodeSelector:
+        kubernetes.io/hostname: angron-node0
+      imagePullSecrets:
+        - name: ghcr-login-secret

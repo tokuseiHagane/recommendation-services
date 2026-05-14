@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-prod
+  namespace: databases
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: postgres-prod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-prod
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: prod-db-vps
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      initContainers:
+        - name: init-permissions
+          image: busybox:1.37
+          command: ["sh", "-c", "chown -R 999:999 /data/pgdata"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /data/pgdata
+              subPath: pgdata
+              name: postgres-pv
+      containers:
+        - name: postgres
+          image: postgres:18.3
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - "-c"
+            - "config_file=/etc/postgresql/conf.d/postgresql.conf"
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-prod-secret
+                  key: postgres-root-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-prod-secret
+                  key: postgres-root-password
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-prod-configmap
+                  key: postgres-dbname
+            - name: PGDATA
+              value: /data/pgdata
+          ports:
+            - containerPort: 5432
+              name: postgresql
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - mountPath: /data/pgdata
+              subPath: pgdata
+              name: postgres-pv
+            - mountPath: /etc/postgresql/conf.d
+              name: postgres-config-volume
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "3584Mi"
+              cpu: "2"
+      volumes:
+        - name: postgres-pv
+          persistentVolumeClaim:
+            claimName: postgres-prod-pvc
+        - name: postgres-config-volume
+          configMap:
+            name: postgres-prod-config
+            items:
+              - key: postgresql.conf
+                path: postgresql.conf
+            defaultMode: 0644

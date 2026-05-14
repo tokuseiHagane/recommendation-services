@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tg-channel-consumer-prod-configmap
+  namespace: parsers
+  labels:
+    app: tg-channel-consumer-prod
+    version: prod
+data:
+  APP_NAME: "tg-channel-consumer"
+  ENV: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+
+  ENABLE_TG_MODULE: "true"
+  ENABLE_VK_MODULE: "true"
+
+  # Telegram database (prod postgres на отдельном VPS)
+  TG_DB_HOST: "postgres-prod.databases.svc.cluster.local"
+  TG_DB_PORT: "5432"
+  TG_DB_USER: "root"
+  TG_DB_NAME: "tg_channels_prod"
+
+  # VK database
+  VK_DB_HOST: "postgres-prod.databases.svc.cluster.local"
+  VK_DB_PORT: "5432"
+  VK_DB_USER: "root"
+  VK_DB_NAME: "vk_groups_prod"
+
+  # Kafka / Redpanda
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+
+  TG_KAFKA_TOPIC: "tg_channels"
+  TG_KAFKA_GROUP_ID: "tg-channel-consumer-prod"
+
+  VK_KAFKA_TOPIC: "vk_groups"
+  VK_KAFKA_GROUP_ID: "vk-group-consumer-prod"
+
+  # Batch
+  BATCH_SIZE: "100"
+  BATCH_TIMEOUT: "5.0"

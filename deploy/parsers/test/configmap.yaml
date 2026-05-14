@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vkparser-test-configmap
+  namespace: parsers
+  labels:
+    app: vkparser-test
+    version: test
+data:
+  APP_NAME: "vk-parser-service"
+  APP_ENV: "test"
+  APP_DEBUG: "true"
+  APP_HOST: "0.0.0.0"
+  APP_PORT: "8000"
+
+  API_VERSION: "v1"
+  SERVICE_NAME: "vk"
+
+  AUTH_SERVICE_URL: "http://auth-test-service.auth.svc.cluster.local:3000"
+  AUTH_JWKS_URL: "http://auth-test-service.auth.svc.cluster.local:3000/api/auth/jwks"
+  AUTH_JWT_ISSUER: "fdauth-service"
+  AUTH_JWT_AUDIENCE: "fdauth-integrations"
+  AUTH_JWT_ALGORITHMS: '["RS256"]'
+  AUTH_JWT_LEEWAY_SECONDS: "30"
+  AUTH_JWKS_CACHE_TTL_SECONDS: "300"
+  AUTH_VK_TOKEN_ENDPOINT: "/api/internal/auth/vk-account"
+  AUTH_HTTP_TIMEOUT_SECONDS: "5.0"
+  AUTH_ENABLE_LEGACY_COOKIE_FALLBACK: "false"
+  AUTH_ENABLE_LEGACY_DB_FALLBACK: "false"
+
+  # DATABASE_URL moved to secret (contains credentials)
+
+  REDIS_URL: "redis://redis.redis.svc.cluster.local:6379/0"
+  REDIS_DEFAULT_TTL: "86400"
+
+  KAFKA_BOOTSTRAP_SERVERS: "redpanda.redpanda.svc.cluster.local:9092"
+  KAFKA_GROUPS_TOPIC: "vk_groups"
+  KAFKA_POSTS_TOPIC_PREFIX: "vk_posts_"
+
+  CORS_ALLOW_ORIGINS: '["https://*.fatdataseo.com","https://fatdataseo.com"]'
+  CORS_ALLOW_CREDENTIALS: "true"
+  CORS_ALLOW_METHODS: '["*"]'
+  CORS_ALLOW_HEADERS: '["*"]'
+
+  LOGFIRE_PROJECT_NAME: "vk-parser-service"
+  LOGFIRE_ENVIRONMENT: "test"
+  LOGFIRE_LOG_LEVEL: "DEBUG"
+  LOGFIRE_SAMPLE_RATE: "1.0"

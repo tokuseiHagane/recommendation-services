@@ -1,0 +1,161 @@
+name: Ruff
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths: ["**.py", "pyproject.toml"]
+  pull_request:
+    paths: ["**.py", "pyproject.toml"]
+
+concurrency:
+  group: ruff-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ruff:
+    name: Lint & Format
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ruff Check
+        id: lint
+        run: |
+          set +e
+
+          nix shell nixpkgs#ruff --command ruff check --output-format=github . 2>&1
+          lint_exit=$?
+
+          version=$(nix shell nixpkgs#ruff --command ruff version)
+          stats=$(nix shell nixpkgs#ruff --command ruff check --statistics . 2>&1 || true)
+          grouped=$(nix shell nixpkgs#ruff --command ruff check --output-format=grouped . 2>&1 || true)
+
+          {
+            echo "## Ruff Lint — v${version}"
+            echo ""
+            if [ $lint_exit -eq 0 ]; then
+              echo "All checks passed!"
+            else
+              echo "Lint errors found"
+              echo ""
+              echo "<details>"
+              echo "<summary>Statistics</summary>"
+              echo ""
+              echo '```'
+              echo "$stats"
+              echo '```'
+              echo "</details>"
+              echo ""
+              echo "<details>"
+              echo "<summary>Full report</summary>"
+              echo ""
+              echo '```'
+              echo "$grouped"
+              echo '```'
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ $lint_exit -eq 0 ]; then
+            echo "result=All checks passed" >> "$GITHUB_OUTPUT"
+          else
+            count=$(echo "$stats" | tail -1 | grep -oP '\d+(?= error)' || echo "?")
+            echo "result=${count} errors found" >> "$GITHUB_OUTPUT"
+          fi
+          echo "exit_code=$lint_exit" >> "$GITHUB_OUTPUT"
+
+          exit $lint_exit
+
+      - name: Ruff Format
+        id: format
+        if: always()
+        run: |
+          set +e
+
+          output=$(nix shell nixpkgs#ruff --command ruff format --check --diff . 2>&1)
+          fmt_exit=$?
+
+          {
+            echo ""
+            echo "## Ruff Format"
+            echo ""
+            if [ $fmt_exit -eq 0 ]; then
+              echo "All files properly formatted!"
+            else
+              echo "Formatting issues found"
+              echo ""
+              echo "<details>"
+              echo "<summary>Diff</summary>"
+              echo ""
+              echo '```diff'
+              echo "$output"
+              echo '```'
+              echo "</details>"
+              echo ""
+              echo '> Run `ruff format .` to fix'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ $fmt_exit -eq 0 ]; then
+            echo "result=All files OK" >> "$GITHUB_OUTPUT"
+          else
+            count=$(echo "$output" | grep -c '^--- ' || echo "?")
+            echo "result=${count} files need formatting" >> "$GITHUB_OUTPUT"
+          fi
+          echo "exit_code=$fmt_exit" >> "$GITHUB_OUTPUT"
+
+          exit $fmt_exit
+
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const lint = `${{ steps.lint.outputs.result }}` || 'skipped';
+            const format = `${{ steps.format.outputs.result }}` || 'skipped';
+            const lintOk = '${{ steps.lint.outputs.exit_code }}' === '0';
+            const fmtOk = '${{ steps.format.outputs.exit_code }}' === '0';
+            const allOk = lintOk && fmtOk;
+
+            const header = allOk ? '## Ruff - OK' : '## Ruff - Issues';
+            const body = [
+              header,
+              '',
+              '| Check | Result |',
+              '|-------|--------|',
+              `| Lint | ${lint} |`,
+              `| Format | ${format} |`,
+              '',
+              allOk
+                ? ''
+                : '> `ruff check --fix . && ruff format .`',
+              '',
+              `<sub>[Job details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`,
+            ].filter(Boolean).join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c =>
+              c.body?.startsWith('## Ruff - OK') || c.body?.startsWith('## Ruff - Issues')
+            );
+
+            const params = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            };
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...params, comment_id: existing.id });
+            } else {
+              await github.rest.issues.createComment({ ...params, issue_number: context.issue.number });
+            }

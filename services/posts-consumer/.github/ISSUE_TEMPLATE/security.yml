@@ -1,0 +1,268 @@
+name: 🔒 Вопрос безопасности
+description: Сообщите о проблеме безопасности или предложите улучшение безопасности
+title: "[БЕЗОПАСНОСТЬ]: "
+labels: ["security", "needs review"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🚨 **ВНИМАНИЕ: Критические уязвимости безопасности**
+        
+        **НЕ ПУБЛИКУЙТЕ критические уязвимости безопасности в открытых issues!**
+        
+        Для сообщения о критических уязвимостях:
+        1. Отправьте email на: security@yourproject.com
+        2. Используйте GitHub Security Advisories
+        3. Свяжитесь с мейнтейнером напрямую
+        
+        Данная форма только для некритических вопросов безопасности и улучшений.
+
+  - type: dropdown
+    id: security-type
+    attributes:
+      label: 🛡️ Тип проблемы безопасности
+      description: Выберите тип проблемы
+      options:
+        - "🔍 Общий вопрос о безопасности"
+        - "📋 Предложение по улучшению безопасности"
+        - "🔧 Настройка безопасности"
+        - "📚 Документация по безопасности"
+        - "⚠️ Некритическая уязвимость (низкий риск)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Описание
+      description: Четкое и краткое описание вопроса или предложения по безопасности
+      placeholder: Опишите проблему или предложение...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: auth-components
+    attributes:
+      label: 🔐 Authentication & Authorization
+      description: Затрагиваемые компоненты аутентификации
+      options:
+        - label: User authentication
+        - label: JWT tokens
+        - label: Session management
+        - label: Role-based access control (RBAC)
+        - label: Permission system
+
+  - type: checkboxes
+    id: api-security
+    attributes:
+      label: 🌐 API Security
+      description: Вопросы безопасности API
+      options:
+        - label: Input validation
+        - label: Rate limiting
+        - label: CORS configuration
+        - label: API versioning
+        - label: Request/Response sanitization
+
+  - type: checkboxes
+    id: database-security
+    attributes:
+      label: 🗃️ Database Security
+      description: Безопасность базы данных
+      options:
+        - label: SQL injection prevention
+        - label: Data encryption
+        - label: Connection security
+        - label: Access controls
+        - label: Audit logging
+
+  - type: checkboxes
+    id: infrastructure-security
+    attributes:
+      label: 🏗️ Infrastructure Security
+      description: Безопасность инфраструктуры
+      options:
+        - label: Docker security
+        - label: Environment variables
+        - label: Secrets management
+        - label: Network security
+        - label: Logging security
+
+  - type: textarea
+    id: current-implementation
+    attributes:
+      label: 🔧 Текущая реализация
+      description: Опишите текущую реализацию безопасности (без конфиденциальной информации)
+      placeholder: |
+        # Опишите текущую реализацию безопасности
+      render: python
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: 💡 Предлагаемое улучшение
+      description: Предлагаемое решение
+      placeholder: |
+        # Предлагаемое решение
+      render: python
+
+  - type: checkboxes
+    id: litestar-security
+    attributes:
+      label: ⭐ Litestar Security
+      description: Компоненты безопасности Litestar
+      options:
+        - label: Security middleware
+        - label: CSRF protection
+        - label: XSS prevention
+        - label: Security headers
+        - label: Input validation
+
+  - type: checkboxes
+    id: piccolo-security
+    attributes:
+      label: 🗃️ Piccolo ORM Security
+      description: Безопасность Piccolo ORM
+      options:
+        - label: Parameterized queries
+        - label: Data validation
+        - label: Model permissions
+        - label: Audit trails
+
+  - type: checkboxes
+    id: dishka-security
+    attributes:
+      label: 💉 Dishka Security
+      description: Безопасность Dependency Injection
+      options:
+        - label: Secure dependency injection
+        - label: Scope isolation
+        - label: Provider security
+
+  - type: checkboxes
+    id: faststream-security
+    attributes:
+      label: 🚀 FastStream Security
+      description: Безопасность messaging
+      options:
+        - label: Message encryption
+        - label: Authentication
+        - label: Authorization
+        - label: Secure channels
+
+  - type: checkboxes
+    id: security-checklist
+    attributes:
+      label: 📋 Чеклист безопасности
+      description: Проверьте применимые элементы
+      options:
+        - label: Input validation во всех endpoints
+        - label: Proper error handling (не раскрывает внутреннюю информацию)
+        - label: Rate limiting настроен
+        - label: HTTPS enforcement
+        - label: Secure headers настроены
+        - label: Authentication требуется где нужно
+        - label: Authorization проверяется
+        - label: Логирование безопасности включено
+        - label: Secrets не хранятся в коде
+        - label: Dependencies обновлены
+
+  - type: checkboxes
+    id: security-testing
+    attributes:
+      label: 🧪 Тестирование безопасности
+      description: Типы безопасности тестов
+      options:
+        - label: Unit tests для валидации
+        - label: Integration tests для auth
+        - label: Penetration testing
+        - label: Static code analysis
+        - label: Dependency vulnerability scanning
+
+  - type: checkboxes
+    id: security-tools
+    attributes:
+      label: 🛠️ Security Tools
+      description: Инструменты для анализа безопасности
+      options:
+        - label: bandit (Python security linter)
+        - label: safety (dependency checking)
+        - label: semgrep (static analysis)
+        - label: OWASP ZAP
+        - label: Custom security tests
+
+  - type: dropdown
+    id: risk-assessment
+    attributes:
+      label: 📊 Оценка рисков
+      description: Оцените уровень риска
+      options:
+        - Критический (немедленное действие)
+        - Высокий (в течение дня)
+        - Средний (в течение недели)
+        - Низкий (можно включить в планы)
+        - Информационный (FYI)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: impact-scope
+    attributes:
+      label: 🌍 Область воздействия
+      description: Кто может быть затронут?
+      options:
+        - label: Все пользователи
+        - label: Authenticated пользователи
+        - label: Admin пользователи
+        - label: Specific endpoints
+        - label: Database
+        - label: Infrastructure
+
+  - type: checkboxes
+    id: compliance-standards
+    attributes:
+      label: 📚 Стандарты соответствия
+      description: Применимые стандарты
+      options:
+        - label: OWASP Top 10
+        - label: GDPR
+        - label: PCI DSS (если применимо)
+        - label: SOC 2 (если применимо)
+        - label: Внутренние стандарты
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 💻 Окружение (если применимо)
+      description: Информация об окружении
+      placeholder: |
+        Версии зависимостей:
+        Конфигурация безопасности:
+        Развертывание: [dev/staging/prod]
+      render: yaml
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: ✅ Критерии приемки
+      description: Критерии готовности решения
+      options:
+        - label: Безопасность улучшена без breaking changes
+        - label: Добавлены security тесты
+        - label: Обновлена документация по безопасности
+        - label: Security review пройден
+        - label: Проверен impact на производительность
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Подтверждение
+      description: Пожалуйста, подтвердите следующее
+      options:
+        - label: Это НЕ критическая уязвимость безопасности
+          required: true
+        - label: Я понимаю принципы безопасной разработки
+          required: true
+        - label: Я готов участвовать в обсуждении решения
+          required: true

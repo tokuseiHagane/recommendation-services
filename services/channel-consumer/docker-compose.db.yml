@@ -1,0 +1,48 @@
+# Database-only compose for local development
+services:
+  tg_db:
+    image: postgres:17
+    container_name: tg-channel-db
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: telegram
+    volumes:
+      - tg_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - social-consumer-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d telegram"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  vk_db:
+    image: postgres:17
+    container_name: vk-group-db
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: vk
+    volumes:
+      - vk_db_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - social-consumer-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d vk"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  tg_db_data:
+  vk_db_data:
+
+networks:
+  social-consumer-network:
+    name: social-consumer-network
+    driver: bridge

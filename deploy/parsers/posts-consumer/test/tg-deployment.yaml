@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tg-posts-consumer-test
+  namespace: parsers
+  labels:
+    app: tg-posts-consumer-test
+    component: posts-consumer
+    provider: telegram
+    version: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tg-posts-consumer-test
+  template:
+    metadata:
+      labels:
+        app: tg-posts-consumer-test
+        component: posts-consumer
+        provider: telegram
+        version: test
+    spec:
+      containers:
+        - name: tg-posts-consumer-test
+          image: ghcr.io/fatdataproduct/telegram-posts-consumers/posts-consumer-test:latest
+          imagePullPolicy: Always
+          # Используем /docker-entrypoint.sh из образа: он сам ждёт postgres и
+          # применяет piccolo migrations forwards для указанного SERVICE перед exec "$@".
+          command: ["/docker-entrypoint.sh"]
+          args: ["python", "-m", "src.BootstrapTg"]
+          env:
+            - name: SERVICE
+              value: "tg"
+          envFrom:
+            - configMapRef:
+                name: tg-posts-consumer-test-configmap
+            - secretRef:
+                name: tg-posts-consumer-test-secret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+      nodeSelector:
+        kubernetes.io/hostname: angron-node0
+      imagePullSecrets:
+        - name: ghcr-login-secret

@@ -1,0 +1,152 @@
+name: 🐛 Сообщение о баге
+description: Создайте отчет о баге, чтобы помочь нам улучшить проект
+title: "[БАГ]: "
+labels: ["bug", "needs triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за то, что нашли время сообщить о баге! 
+        Пожалуйста, заполните форму ниже как можно подробнее.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 📝 Описание бага
+      description: Четкое и краткое описание того, что происходит.
+      placeholder: Опишите проблему...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 🔄 Шаги для воспроизведения
+      description: Шаги для воспроизведения проблемы
+      placeholder: |
+        1. Перейти к '...'
+        2. Нажать на '....'
+        3. Прокрутить вниз до '....'
+        4. Видим ошибку
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: ✅ Ожидаемое поведение
+      description: Четкое и краткое описание того, что вы ожидали увидеть.
+      placeholder: Описание ожидаемого поведения...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: ❌ Фактическое поведение
+      description: Четкое и краткое описание того, что произошло вместо ожидаемого.
+      placeholder: Описание фактического поведения...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: porto-component
+    attributes:
+      label: 🏗️ Компонент архитектуры Porto
+      description: Выберите затрагиваемые компоненты
+      options:
+        - label: Container
+        - label: Ship layer
+        - label: Action
+        - label: Task
+        - label: Model
+        - label: Repository
+        - label: Service Provider
+        - label: Middleware
+        - label: Request/Response
+        - label: Controller
+        - label: Command
+
+  - type: input
+    id: specific-component
+    attributes:
+      label: 🎯 Конкретный компонент
+      description: Укажите конкретный файл/класс/модуль где возникает проблема
+      placeholder: например, src/Containers/AppSection/User/Actions/CreateUserAction.py
+
+  - type: dropdown
+    id: environment-os
+    attributes:
+      label: 💻 Операционная система
+      description: На какой ОС возникает проблема?
+      options:
+        - Ubuntu
+        - Debian
+        - CentOS/RHEL
+        - macOS
+        - Windows
+        - Docker
+        - Другая (укажите в дополнительном контексте)
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: 🐍 Версия Python
+      description: Какая версия Python используется?
+      placeholder: например, 3.11.5
+    validations:
+      required: true
+
+  - type: textarea
+    id: package-versions
+    attributes:
+      label: 📦 Версии пакетов
+      description: Версии основных пакетов
+      placeholder: |
+        Litestar: 2.x.x
+        Piccolo: 1.x.x
+        Dishka: 1.x.x
+        FastStream: 0.x.x
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📋 Логи
+      description: Вставьте соответствующие логи или сообщения об ошибках
+      placeholder: Вставьте логи здесь...
+      render: shell
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 🔍 Дополнительный контекст
+      description: Добавьте любой другой контекст о проблеме здесь
+      placeholder: Любая дополнительная информация...
+
+  - type: checkboxes
+    id: priority
+    attributes:
+      label: 📊 Приоритет
+      description: Оцените важность проблемы
+      options:
+        - label: Критический (блокирует продакшн)
+        - label: Высокий (существенно влияет на функциональность)
+        - label: Средний (влияет на некоторые функции)
+        - label: Низкий (незначительная проблема)
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Подтверждение
+      description: Пожалуйста, подтвердите следующее
+      options:
+        - label: Я искал похожие проблемы в существующих issues
+          required: true
+        - label: Я предоставил всю необходимую информацию
+          required: true
+        - label: Я готов предоставить дополнительную информацию при необходимости
+          required: true

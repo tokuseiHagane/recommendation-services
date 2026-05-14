@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vkparser-prod-service
+  namespace: parsers
+  labels:
+    app: vkparser-prod
+spec:
+  selector:
+    app: vkparser-prod
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP

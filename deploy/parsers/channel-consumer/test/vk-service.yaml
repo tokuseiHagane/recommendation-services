@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vk-channel-consumer-test-service
+  namespace: parsers
+  labels:
+    app: vk-channel-consumer-test
+    provider: vk
+spec:
+  selector:
+    app: vk-channel-consumer-test
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP

@@ -1,0 +1,20 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 Документация
+    url: https://github.com/FatDataProduct/LitestarPortoShowcase/tree/main/docs
+    about: Посмотрите документацию проекта для получения подробной информации
+  - name: 💬 Обсуждения
+    url: https://github.com/FatDataProduct/LitestarPortoShowcase/discussions
+    about: Задавайте вопросы и обсуждайте идеи с сообществом
+  - name: 🏗️ Архитектура Porto
+    url: https://mahmoudz.github.io/Porto/docs/Intro/
+    about: Изучите документацию по архитектуре Porto
+  - name: 🐍 Litestar Documentation
+    url: https://docs.litestar.dev/
+    about: Официальная документация Litestar framework
+  - name: 🗃️ Piccolo ORM Documentation  
+    url: https://piccolo-orm.readthedocs.io/
+    about: Документация по Piccolo ORM
+  - name: 💉 Dishka Documentation
+    url: https://dishka.readthedocs.io/
+    about: Документация по Dependency Injection с Dishka
