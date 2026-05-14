@@ -10,6 +10,7 @@ from recs_api.app.routes import health_check, recommend
 from recs_api.app.search import SearchService
 from shared.config import settings
 from shared.db import DB
+from shared.telemetry import configure_otel
 from shared.models.recommendations import (
     RecommendationCandidate,
     RecommendationFeedback,
@@ -40,9 +41,12 @@ async def search_service_lifespan(app: Litestar) -> AsyncGenerator[None, None]:
 
 
 def create_app() -> Litestar:
+    otel_cfg = configure_otel()
+    mw = [otel_cfg.middleware] if otel_cfg else []
     return Litestar(
         route_handlers=[health_check, recommend],
         lifespan=[search_service_lifespan],
+        middleware=mw,
         openapi_config=OpenAPIConfig(
             title="Recommendation API",
             version="0.1.0",

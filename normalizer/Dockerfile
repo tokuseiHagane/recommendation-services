@@ -25,4 +25,4 @@ COPY normalizer/ ./normalizer/
 
 EXPOSE 8000
 
-CMD ["opentelemetry-instrument", "litestar", "--app", "normalizer.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["litestar", "--app", "normalizer.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]

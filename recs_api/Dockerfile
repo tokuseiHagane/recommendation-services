@@ -25,4 +25,4 @@ COPY recs_api/ ./recs_api/
 
 EXPOSE 8000
 
-CMD ["opentelemetry-instrument", "litestar", "--app", "recs_api.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["litestar", "--app", "recs_api.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]

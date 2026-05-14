@@ -25,4 +25,4 @@ COPY indexer/ ./indexer/
 
 EXPOSE 8000
 
-CMD ["opentelemetry-instrument", "litestar", "--app", "indexer.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["litestar", "--app", "indexer.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Monorepo for FatData recommendation system microservices"
 requires-python = ">=3.11"
 dependencies = [
-    "litestar>=2.15",
+    "litestar[standard]>=2.15",
     "piccolo[all]>=1.25",
     "opensearch-py[async]>=2.8",
     "apscheduler>=3.10",
