@@ -12,6 +12,9 @@ dependencies = [
     "pydantic-settings>=2.7",
     "httpx>=0.28",
     "logfire[litestar]>=3.12",
+    "opentelemetry-distro>=0.50b0",
+    "opentelemetry-exporter-otlp>=1.29",
+    "opentelemetry-instrumentation-asgi>=0.50b0",
 ]
 
 [tool.uv]

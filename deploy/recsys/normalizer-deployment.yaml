@@ -14,6 +14,10 @@ spec:
     metadata:
       labels:
         app: normalizer
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: normalizer
@@ -22,6 +26,17 @@ spec:
           ports:
             - containerPort: 8000
               protocol: TCP
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://$(NODE_IP):4317"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_SERVICE_NAME
+              value: "normalizer"
           envFrom:
             - secretRef:
                 name: recsys-secrets

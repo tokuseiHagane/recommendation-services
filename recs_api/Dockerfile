@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock* ./
 COPY shared/ ./shared/
 COPY recs_api/pyproject.toml ./recs_api/
 
-RUN uv sync --no-dev
+RUN uv sync --frozen --no-dev
 
 FROM base AS runtime
 
@@ -25,4 +25,4 @@ COPY recs_api/ ./recs_api/
 
 EXPOSE 8000
 
-CMD ["litestar", "--app", "recs_api.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["opentelemetry-instrument", "litestar", "--app", "recs_api.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]

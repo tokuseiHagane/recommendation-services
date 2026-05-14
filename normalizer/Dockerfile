@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock* ./
 COPY shared/ ./shared/
 COPY normalizer/pyproject.toml ./normalizer/
 
-RUN uv sync --no-dev
+RUN uv sync --frozen --no-dev
 
 FROM base AS runtime
 
@@ -25,4 +25,4 @@ COPY normalizer/ ./normalizer/
 
 EXPOSE 8000
 
-CMD ["litestar", "--app", "normalizer.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["opentelemetry-instrument", "litestar", "--app", "normalizer.app.main:app", "run", "--host", "0.0.0.0", "--port", "8000"]
