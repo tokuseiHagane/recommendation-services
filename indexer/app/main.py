@@ -13,7 +13,7 @@ from litestar.datastructures import State
 
 from shared.config import settings
 from shared.db import DB
-from shared.telemetry import configure_otel
+from shared.telemetry import configure_telemetry
 from shared.models.recommendations import IndexSyncLog
 
 from indexer.app.opensearch_client import RESOURCE_DOCUMENTS_MAPPING, OpenSearchClient
@@ -97,12 +97,11 @@ async def trigger_sync(state: State) -> dict[str, Any]:
 
 
 def create_app() -> Litestar:
-    otel_cfg = configure_otel()
-    mw = [otel_cfg.middleware] if otel_cfg else []
+    plugins = configure_telemetry()
     return Litestar(
         route_handlers=[health_check, trigger_sync],
         lifespan=[indexer_lifespan],
-        middleware=mw,
+        plugins=plugins,
         debug=True,
     )
 

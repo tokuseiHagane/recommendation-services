@@ -11,7 +11,7 @@ from litestar import Litestar, MediaType, get
 
 from shared.config import settings
 from shared.db import DB
-from shared.telemetry import configure_otel
+from shared.telemetry import configure_telemetry
 from shared.models.normalized import (
     AdResource,
     ResourceDocument,
@@ -90,12 +90,11 @@ async def trigger_normalize() -> dict:
 
 
 def create_app() -> Litestar:
-    otel_cfg = configure_otel()
-    mw = [otel_cfg.middleware] if otel_cfg else []
+    plugins = configure_telemetry()
     return Litestar(
         route_handlers=[health_check, trigger_normalize],
         lifespan=[lifespan],
-        middleware=mw,
+        plugins=plugins,
         debug=True,
     )
 
